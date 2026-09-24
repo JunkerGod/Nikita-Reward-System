@@ -38,6 +38,7 @@ export interface Transaction {
   added_by: string;
   created_at: string;
   reward_id: string | null;
+  bonus_key: string | null;
 }
 
 export interface Redemption {
@@ -45,8 +46,10 @@ export interface Redemption {
   reward_id: string | null;
   transaction_id: string;
   redeemed_at: string;
-  status: "claimed" | "delivered";
+  status: "claimed" | "used" | "delivered";
   delivered_at: string | null;
+  used_at: string | null;
+  scheduled_for: string | null;
   transaction: Pick<Transaction, "label" | "points"> | null;
 }
 
@@ -86,4 +89,32 @@ export interface Seen {
   user_id: string;
   last_seen_transaction_at: string | null;
   last_seen_behaviour_at: string | null;
+  badges_seen: string[];
+}
+
+export interface Appeal {
+  id: string;
+  text: string;
+  from_level: LevelId;
+  status: "pending" | "accepted" | "denied";
+  reply: string | null;
+  created_by: string;
+  created_at: string;
+  decided_at: string | null;
+}
+
+export type SpecialKind = "birthday_jagath" | "birthday_nikita" | "anniversary" | "first_talk" | "first_date" | "other";
+
+export interface SpecialDay {
+  id: string;
+  name: string;
+  kind: SpecialKind;
+  month: number;
+  day: number;
+  year: number | null;
+}
+
+export interface Streak {
+  current_streak: number;
+  best_streak: number;
 }

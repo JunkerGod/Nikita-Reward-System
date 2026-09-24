@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { IconContext } from "@phosphor-icons/react";
 import { supabase } from "./lib/supabase";
@@ -21,6 +21,10 @@ import { History } from "./screens/History";
 import { MyRewards } from "./screens/MyRewards";
 import { Settings } from "./screens/Settings";
 import { NotFound } from "./screens/NotFound";
+// Less-used pages load on demand to keep the first load small.
+const Stats = lazy(() => import("./screens/Stats").then((m) => ({ default: m.Stats })));
+const Recap = lazy(() => import("./screens/Recap").then((m) => ({ default: m.Recap })));
+const Memories = lazy(() => import("./screens/Memories").then((m) => ({ default: m.Memories })));
 
 export function App() {
   return (
@@ -137,6 +141,23 @@ function Screen({ path }: { path: string }) {
       return <MyRewards />;
     case "/settings":
       return <Settings />;
+    case "/stats":
+    case "/recap":
+    case "/memories": {
+      const Page = path === "/stats" ? Stats : path === "/recap" ? Recap : Memories;
+      return (
+        <Suspense
+          fallback={
+            <LoadingScreen>
+              <Skeleton className="h-9 w-48" />
+              <Skeleton className="mt-6 h-40" />
+            </LoadingScreen>
+          }
+        >
+          <Page />
+        </Suspense>
+      );
+    }
     default:
       return <NotFound />;
   }

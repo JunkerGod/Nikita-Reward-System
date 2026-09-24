@@ -20,6 +20,8 @@ function knownMessage(e: unknown): string | null {
   if (text.includes("balance_negative")) return COPY.balanceNegative;
   if (text.includes("not_enough_points")) return COPY.notEnoughPoints;
   if (text.includes("reward_not_found")) return COPY.rewardGone;
+  if (text.includes("appeal_gone")) return "That appeal was already decided";
+  if (text.includes("coupon_not_ready")) return "That one was already used";
   return null;
 }
 

@@ -13,6 +13,7 @@ import { FACES_BUCKET, supabase } from "./supabase";
 import { must } from "./save";
 import type {
   Activity,
+  Appeal,
   BehaviourLevel,
   FacePhoto,
   PhotoKind,
@@ -20,7 +21,9 @@ import type {
   Redemption,
   Reward,
   Seen,
+  SpecialDay,
   Stats,
+  Streak,
   Transaction,
   Wish,
 } from "./types";
@@ -38,6 +41,10 @@ interface DataState {
   redemptions: Redemption[];
   photos: FacePhoto[];
   seen: Seen | null;
+  appeals: Appeal[];
+  specialDays: SpecialDay[];
+  settings: Record<string, string | null>;
+  streak: Streak;
 }
 
 const EMPTY: DataState = {
@@ -51,6 +58,10 @@ const EMPTY: DataState = {
   redemptions: [],
   photos: [],
   seen: null,
+  appeals: [],
+  specialDays: [],
+  settings: {},
+  streak: { current_streak: 0, best_streak: 0 },
 };
 
 type Part =
@@ -63,7 +74,11 @@ type Part =
   | "levels"
   | "redemptions"
   | "photos"
-  | "seen";
+  | "seen"
+  | "appeals"
+  | "specialDays"
+  | "settings"
+  | "streak";
 
 export interface RealtimeEvent {
   table: string;
@@ -148,6 +163,22 @@ async function fetchPart(part: Part, userId: string): Promise<Partial<DataState>
       const byPath = new Map((signed ?? []).map((s) => [s.path, s.signedUrl]));
       return { photos: rows.map((r) => ({ ...r, url: byPath.get(r.storage_path) ?? null })) };
     }
+    case "appeals":
+      return {
+        appeals: must(await supabase.from("appeals").select("*").order("created_at", { ascending: false }).limit(50)) as Appeal[],
+      };
+    case "specialDays":
+      return {
+        specialDays: must(await supabase.from("special_days").select("*").order("month").order("day")) as SpecialDay[],
+      };
+    case "settings": {
+      const rows = must(await supabase.from("app_settings").select("key,value")) as { key: string; value: string | null }[];
+      return { settings: Object.fromEntries(rows.map((r) => [r.key, r.value])) };
+    }
+    case "streak": {
+      const rows = must(await supabase.rpc("streak_info")) as Streak[];
+      return { streak: rows[0] ?? { current_streak: 0, best_streak: 0 } };
+    }
     case "seen": {
       const row = must(await supabase.from("seen").select("*").eq("user_id", userId).maybeSingle()) as Seen | null;
       if (row) return { seen: row };
@@ -176,10 +207,14 @@ const ALL_PARTS: Part[] = [
   "redemptions",
   "photos",
   "seen",
+  "appeals",
+  "specialDays",
+  "settings",
+  "streak",
 ];
 
 const TABLE_PARTS: Record<string, Part[]> = {
-  transactions: ["stats", "recent", "redemptions"],
+  transactions: ["stats", "recent", "redemptions", "streak"],
   rewards: ["rewards", "profiles"],
   wishes: ["wishes"],
   behaviour_levels: ["levels"],
@@ -187,6 +222,9 @@ const TABLE_PARTS: Record<string, Part[]> = {
   profiles: ["profiles"],
   activities: ["activities"],
   face_photos: ["photos"],
+  appeals: ["appeals"],
+  special_days: ["specialDays"],
+  app_settings: ["settings"],
 };
 
 export function DataProvider({ session, children }: { session: Session; children: ReactNode }) {

@@ -10,6 +10,8 @@ import { BackLink, Button, Counter, IconButton, LoadingScreen, PageTitle, Skelet
 import { ConfirmDialog, Sheet } from "../components/Sheet";
 import { CropDialog } from "../components/CropDialog";
 import { FaceSticker, PlaceholderSticker } from "../components/FaceSticker";
+import { NotificationSettings } from "../components/Notifications";
+import { AlbumSettings, SpecialDaysSettings } from "../components/SettingsExtra";
 import type { Activity, Category, FacePhoto, PhotoKind } from "../lib/types";
 
 const CATEGORIES: { id: Category; label: string }[] = [
@@ -40,8 +42,13 @@ export function Settings() {
         </LoadingScreen>
       ) : (
         <>
-          <Activities />
+          <NotificationSettings />
+          <div className="mt-10">
+            <Activities />
+          </div>
+          <SpecialDaysSettings />
           <Photos />
+          <AlbumSettings />
           <section aria-labelledby="backup" className="mt-10">
             <h2 id="backup" className="mb-1 text-xl font-black text-ink">
               Backup
@@ -430,7 +437,19 @@ function ExportButton() {
   const run = async () => {
     setBusy(true);
     try {
-      const tables = ["profiles", "activities", "rewards", "transactions", "redemptions", "wishes", "behaviour_levels", "face_photos"] as const;
+      const tables = [
+        "profiles",
+        "activities",
+        "rewards",
+        "transactions",
+        "redemptions",
+        "wishes",
+        "behaviour_levels",
+        "face_photos",
+        "appeals",
+        "special_days",
+        "app_settings",
+      ] as const;
       const out: Record<string, unknown> = { exported_at: new Date().toISOString(), app: "Nikita's Rewards" };
       for (const t of tables) {
         out[t] = must(await supabase.from(t).select("*"));

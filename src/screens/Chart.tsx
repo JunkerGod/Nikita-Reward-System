@@ -4,6 +4,7 @@ import { currentLevel, useData } from "../lib/data";
 import { supabase } from "../lib/supabase";
 import { must, useSave } from "../lib/save";
 import { useConfetti } from "../confetti/Confetti";
+import { AppealPanel } from "../components/Appeals";
 import { useToast } from "../components/Toasts";
 import { Sheet } from "../components/Sheet";
 import { Button, Counter, LoadingScreen, PageTitle, Skeleton } from "../components/ui";
@@ -87,6 +88,8 @@ export function Chart() {
               <p className="text-sm font-semibold text-muted">Set {fmtShortDate(latest.created_at)}</p>
             </div>
           ) : null}
+
+          <AppealPanel board={board} />
 
           <section aria-labelledby="chart-history" className="mt-8">
             <h2 id="chart-history" className="mb-3 text-xl font-black text-ink">

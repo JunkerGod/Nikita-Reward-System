@@ -8,6 +8,9 @@ import { Link } from "../lib/router";
 import { AnimatedNumber, ButtonLink, Card, EmptyState, LoadingScreen, PageTitle, ProgressBar, Skeleton } from "../components/ui";
 import { FaceSticker } from "../components/FaceSticker";
 import { TransactionRow } from "../components/TransactionRow";
+import { CountdownCard, RecapCard, SpecialDayBanner, StreakChip } from "../components/HomeExtras";
+import { AppealHomeCard } from "../components/Appeals";
+import { NotificationPrompt } from "../components/Notifications";
 
 export function Home() {
   const { status, me, isNikita, nikita, stats, rewards, levels, recent, profiles, photosOf } = useData();
@@ -38,13 +41,19 @@ export function Home() {
     <>
       <PageTitle>{greeting(me.name, isNikita)}</PageTitle>
 
+      <SpecialDayBanner />
+
       <section aria-label="Points" className="relative overflow-hidden rounded-2xl bg-soft px-5 py-6 shadow-card">
         <p className="text-base font-extrabold text-ink">{isNikita ? COPY.balanceLabel : "Nikita’s points"}</p>
         <p className="mt-1 text-[64px] font-black leading-none tracking-tight text-ink">
           <AnimatedNumber value={balance} />
         </p>
+        <StreakChip />
         <FaceSticker src={happy} kind="nikita_happy" width={84} className="absolute -right-1 bottom-2 rotate-6" />
       </section>
+
+      <AppealHomeCard />
+      <NotificationPrompt />
 
       <Card className="mt-4">
         <h2 className="flex items-center gap-2 text-sm font-extrabold text-muted">
@@ -103,6 +112,9 @@ export function Home() {
           Reward Shop
         </ButtonLink>
       </div>
+
+      <RecapCard />
+      <CountdownCard />
 
       <section aria-labelledby="latest" className="mt-8">
         <div className="mb-3 flex items-baseline justify-between">

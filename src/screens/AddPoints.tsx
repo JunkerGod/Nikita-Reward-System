@@ -4,6 +4,7 @@ import { useData } from "../lib/data";
 import { supabase } from "../lib/supabase";
 import { must, useSave, useUnsavedWarning } from "../lib/save";
 import { useConfetti } from "../confetti/Confetti";
+import { useToast } from "../components/Toasts";
 import { useRouter } from "../lib/router";
 import { earnMessage } from "../lib/copy";
 import { NamedIcon } from "../lib/icons";
@@ -15,6 +16,13 @@ const GROUPS: { id: Category; title: string }[] = [
   { id: "medium", title: "Medium" },
   { id: "big", title: "BIG ones" },
 ];
+
+interface AddResult {
+  id: string;
+  bonus_id: string | null;
+  bonus_points: number;
+  streak: number;
+}
 
 const NOTE_MAX = 200;
 const LABEL_MAX = 60;
@@ -29,6 +37,7 @@ export function AddPoints() {
   const [busy, setBusy] = useState(false);
   const save = useSave();
   const play = useConfetti();
+  const toast = useToast();
   const { navigate } = useRouter();
   const { photosOf } = useData();
   const labelRef = useRef<HTMLInputElement>(null);
@@ -57,23 +66,36 @@ export function AddPoints() {
     if (note.length > NOTE_MAX) return;
 
     const entry = {
-      type: "earn" as const,
       points: amount,
       label: selected === "custom" ? label.trim() : activity!.name,
       note: note.trim() || null,
     };
     setBusy(true);
     await save(
-      async () => must(await supabase.from("transactions").insert(entry)),
-      () => {
+      async () =>
+        must(await supabase.rpc("add_points", { p_label: entry.label, p_points: entry.points, p_note: entry.note })) as AddResult,
+      (res) => {
         play({
           images: photosOf("nikita_happy").map((p) => p.url!),
           shape: "heart",
           count: entry.points >= 50 ? 60 : 30 + Math.floor(Math.random() * 11),
-          secondWave: entry.points >= 50,
+          secondWave: entry.points >= 50 || res.bonus_points > 0,
           message: earnMessage(entry.points),
         });
-        void refresh("stats", "recent");
+        const ids = [res.id, res.bonus_id].filter((x): x is string => !!x);
+        toast.show(res.bonus_points > 0 ? `Added +${entry.points}, ${res.streak} day streak +${res.bonus_points}` : `Added +${entry.points}`, {
+          actionLabel: "Undo",
+          duration: 6000,
+          action: () =>
+            void save(
+              async () => must(await supabase.from("transactions").delete().in("id", ids)),
+              () => {
+                toast.show("Oki undone");
+                void refresh("stats", "recent", "streak");
+              },
+            ),
+        });
+        void refresh("stats", "recent", "streak");
         navigate("/");
       },
     );

@@ -6,11 +6,13 @@ interface Toast {
   id: number;
   message: string;
   action?: () => void;
+  /** Shows the action as its own button (e.g. "Undo") instead of making the toast tappable. */
+  actionLabel?: string;
   duration: number;
 }
 
 interface ToastApi {
-  show: (message: string, opts?: { action?: () => void; duration?: number }) => void;
+  show: (message: string, opts?: { action?: () => void; actionLabel?: string; duration?: number }) => void;
 }
 
 const ToastContext = createContext<ToastApi | null>(null);
@@ -28,7 +30,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       const id = nextId.current++;
       const duration = opts?.duration ?? (opts?.action ? 8000 : 2600);
       // Replace any toast with the same text so retries don't stack up.
-      setToasts((t) => [...t.filter((x) => x.message !== message).slice(-2), { id, message, action: opts?.action, duration }]);
+      setToasts((t) => [...t.filter((x) => x.message !== message).slice(-2), { id, message, action: opts?.action, actionLabel: opts?.actionLabel, duration }]);
       window.setTimeout(() => dismiss(id), duration);
     },
     [dismiss],
@@ -70,10 +72,24 @@ function ToastItem({ toast, onDone }: { toast: Toast; onDone: () => void }) {
 
   return (
     <div ref={ref}>
-      {toast.action ? (
+      {toast.action && toast.actionLabel ? (
+        <div className={`${base} py-2 pr-2`}>
+          <span>{toast.message}</span>
+          <button
+            type="button"
+            className="press min-h-10 rounded-full bg-mid px-4 text-[15px] font-black text-ink transition-colors duration-150 hover:bg-soft"
+            onClick={() => {
+              toast.action?.();
+              onDone();
+            }}
+          >
+            {toast.actionLabel}
+          </button>
+        </div>
+      ) : toast.action ? (
         <button
           type="button"
-          className={`${base} transition-transform duration-100 hover:bg-[#5c2b40] focus-visible:outline-offset-4 active:scale-[0.98]`}
+          className={`press ${base} transition-colors duration-150 hover:bg-[#5c2b40] focus-visible:outline-offset-4`}
           onClick={() => {
             toast.action?.();
             onDone();

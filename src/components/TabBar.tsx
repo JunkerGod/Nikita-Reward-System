@@ -6,7 +6,7 @@ const TABS: { href: string; label: string; icon: Icon; match: string[] }[] = [
   { href: "/add", label: "Add", icon: PlusCircleIcon, match: ["/add"] },
   { href: "/shop", label: "Shop", icon: StorefrontIcon, match: ["/shop"] },
   { href: "/chart", label: "Chart", icon: ChartBarIcon, match: ["/chart"] },
-  { href: "/more", label: "More", icon: DotsThreeCircleIcon, match: ["/more", "/history", "/my-rewards", "/settings"] },
+  { href: "/more", label: "More", icon: DotsThreeCircleIcon, match: ["/more", "/history", "/my-rewards", "/settings", "/stats", "/recap", "/memories"] },
 ];
 
 export function TabBar() {
