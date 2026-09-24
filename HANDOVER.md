@@ -10,6 +10,9 @@
 On each phone, open the site in Safari or Chrome, log in, then use Share, then "Add to Home
 Screen" to get the pink heart app icon.
 
+Netlify shows a small "Powered by Netlify" badge at the bottom of free sites, which sits over
+the tab bar. Open it and tap "Hide this badge" once on each phone; the phone remembers.
+
 ## Changing things without code
 
 - Rewards and prices: Shop tab, Add Reward (Jagath only). Edit, Hide or Delete on each card.
