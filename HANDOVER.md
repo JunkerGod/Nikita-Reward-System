@@ -13,12 +13,25 @@ Screen" to get the pink heart app icon.
 Netlify shows a small "Powered by Netlify" badge at the bottom of free sites, which sits over
 the tab bar. Open it and tap "Hide this badge" once on each phone; the phone remembers.
 
+## Turning on notifications (once per phone)
+
+1. Add the app to the Home Screen (Share, then Add to Home Screen) and open it from there.
+2. More, Settings, Notifications, Turn On Notifications, then Allow.
+3. Tap Send Test to check it buzzes.
+
+## Linking the shared album (once)
+
+In Photos, open ur shared album, tap the people icon, turn on Public Website, copy the link.
+Then More, Settings, Photo memories, paste it and tap Save Link. Photos added to the album
+show up in More, Memories.
+
 ## Changing things without code
 
 - Rewards and prices: Shop tab, Add Reward (Jagath only). Edit, Hide or Delete on each card.
 - Activities and point values: More, Settings, Activities.
 - Face photos: More, Settings, Face photos. Upload, crop into the oval, done.
 - Backup: More, Settings, Export My Data (saves a JSON file). Worth doing now and then.
+- Special days (birthdays, anniversary): More, Settings, Special days.
 
 ## If something ever breaks
 
@@ -38,7 +51,10 @@ the tab bar. Open it and tap "Hide this badge" once on each phone; the phone rem
    where email = 'nikita@nikitas-rewards.local';
    ```
 
-5. **Balance looks wrong.** More, History shows every entry. Delete the wrong one (it asks
+5. **Notifications stopped.** On that phone: Settings, Notifications, Turn Off, then Turn On
+   again. If the phone was reset or the app removed from the Home Screen, just turn them on again.
+6. **Memories page says it cant load.** Check Public Website is still on for the album in Photos.
+7. **Balance looks wrong.** More, History shows every entry. Delete the wrong one (it asks
    first) and the balance fixes itself.
 
 ## Checking the keep-alive

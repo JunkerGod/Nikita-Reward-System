@@ -7,6 +7,13 @@ app. Nikita also sets Jagath's level on the Boyfriend Behaviour Chart.
 Everything that changes day to day (rewards, prices, activities, point values, face photos,
 the chart level) is edited inside the app. No code changes needed.
 
+## Features
+
+Points and a reward shop, the Boyfriend Behaviour Chart with appeals, streak bonuses, undo,
+coupons, milestone badges, special days (with a countdown and themed confetti), an
+"Us, in Numbers" stats page, a monthly recap, phone notifications and photo memories from an
+iCloud shared album.
+
 ## Stack
 
 - Vite + React + TypeScript, built as a static site
@@ -28,8 +35,10 @@ src/
   chart/               Behaviour Chart board, SVG decorations, Jagath's pop-up
   confetti/            the reusable face confetti
   components/          buttons, sheets, reward card/form, crop tool, toasts
-supabase/migrations/   tables, security rules, storage bucket, starter data, keep-alive
-netlify/functions/     keep-alive.mts (runs @daily)
+supabase/migrations/   tables, security rules, storage bucket, starter data, keep-alive, features
+supabase/functions/    push: sends web push notifications (deployed to Supabase)
+netlify/functions/     keep-alive.mts (runs @daily), album.mts (reads the iCloud shared album)
+public/sw.js           service worker: shows notifications, no caching
 ```
 
 All message text lives in `src/lib/copy.ts`.
@@ -77,3 +86,20 @@ write anything. On top of that:
 
 Points are a list of transactions. The balance is always the sum of them, so deleting an entry
 fixes the balance by itself. See `supabase/migrations/20260924000001_schema.sql`.
+
+## Notifications
+
+- Phones subscribe from Settings (on iPhone the app must be added to the Home Screen first).
+- Database triggers call `public.send_push()`, which uses `pg_net` to call the `push` Edge
+  Function with a shared secret. The function sends the notification with `web-push`.
+- VAPID keys, the push secret and the function URL live in Supabase Vault
+  (`vapid_public`, `vapid_private`, `vapid_subject`, `push_secret`, `push_url`), never in git.
+- A `pg_cron` job (`daily-push`, 21:00 UTC = 7am or 8am Sydney) sends special day and monthly
+  recap notifications.
+
+## Photo memories
+
+The Memories page reads an iCloud shared album with "Public Website" turned on. The link is
+saved in Settings (`app_settings.icloud_album`), and `netlify/functions/album.mts` fetches the
+album's public web feed. Apple can change that feed without notice; if it stops working the page
+falls back to an "Open in Photos" button.
