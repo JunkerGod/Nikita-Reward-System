@@ -1,0 +1,272 @@
+@import "tailwindcss";
+@import "@fontsource-variable/nunito/wght.css";
+@import "@fontsource/great-vibes/400.css";
+
+@theme {
+  --font-sans: "Nunito Variable", "Nunito", ui-rounded, system-ui, sans-serif;
+  --font-script: "Great Vibes", cursive;
+
+  --color-page: #fff5f8;
+  --color-surface: #ffffff;
+  --color-soft: #ffd6e4;
+  --color-mid: #ff9ec0;
+  --color-bright: #e84a86;
+  --color-btn: #c92f6d;
+  --color-btn-hover: #b3265f;
+  --color-ink: #4a2233;
+  --color-muted: #865369;
+  --color-earn: #ffe3ec;
+  --color-spend: #fff1f5;
+
+  --shadow-card: 0 1px 2px rgb(201 47 109 / 0.06), 0 8px 24px -12px rgb(201 47 109 / 0.28);
+  --shadow-pop: 0 10px 28px -10px rgb(201 47 109 / 0.45);
+}
+
+:root {
+  color-scheme: light;
+  -webkit-tap-highlight-color: rgb(255 158 192 / 0.25);
+  -webkit-text-size-adjust: 100%;
+}
+
+html,
+body {
+  background: var(--color-page);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  touch-action: manipulation;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+}
+
+a,
+button,
+input,
+textarea,
+select,
+label,
+[role="slider"] {
+  touch-action: manipulation;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-btn);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--color-soft);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-muted);
+  opacity: 1;
+}
+
+/* Sheets and dialogs (native <dialog>) */
+.sheet-dialog {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  max-width: 100vw;
+  max-height: 100dvh;
+  width: 100%;
+  overscroll-behavior: contain;
+  color: var(--color-ink);
+}
+.sheet-dialog::backdrop {
+  background: rgb(74 34 51 / 0.38);
+}
+.sheet-bottom {
+  top: auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.sheet-bottom > div {
+  max-width: 560px;
+  margin: 0 auto;
+}
+.sheet-center {
+  inset: 0;
+  margin: auto;
+  height: fit-content;
+  padding: 16px;
+  max-width: 440px;
+}
+.sheet-dialog.sheet-light::backdrop {
+  background: rgb(255 245 248 / 0.55);
+}
+
+/* Face stickers */
+.sticker-shadow {
+  filter: drop-shadow(0 6px 10px rgb(232 74 134 / 0.32));
+}
+
+/* Confetti message */
+.confetti-message {
+  font-size: clamp(44px, 14vw, 72px);
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--color-bright);
+  text-align: center;
+  padding: 0 16px;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 6px #fff,
+    0 0 12px #fff,
+    0 3px 14px rgb(232 74 134 / 0.35);
+}
+
+/* Behaviour chart */
+.band-label {
+  font-family: var(--font-script);
+  font-size: clamp(44px, 12.5vw, 68px);
+  line-height: 1.18;
+  padding: 0.08em 0.12em 0.14em;
+  text-align: center;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 5px #fff,
+    0 0 10px #fff,
+    0 0 16px #fff;
+}
+.chart-compact .band-label {
+  font-size: 40px;
+}
+.band-button {
+  cursor: pointer;
+}
+.band-button:focus-visible {
+  outline-offset: -4px;
+}
+.band[data-hover]::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 3px var(--color-mid), inset 0 0 24px rgb(255 158 192 / 0.45);
+  pointer-events: none;
+  z-index: 12;
+}
+.band + .band {
+  border-top: 1px solid #f7e6ec;
+}
+.jail-bar {
+  background: #545454;
+  box-shadow: inset -2px 0 0 rgb(255 255 255 / 0.18);
+}
+.shimmer {
+  background: linear-gradient(100deg, transparent 0%, rgb(255 255 255 / 0.9) 45%, rgb(255 244 214 / 0.95) 50%, rgb(255 255 255 / 0.9) 55%, transparent 100%);
+  transform: skewX(-18deg);
+}
+.face-piece {
+  cursor: grab;
+  border-radius: 50%;
+}
+.face-piece[role="slider"]:focus-visible {
+  outline-offset: 4px;
+}
+body.is-dragging,
+body.is-dragging * {
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grabbing;
+}
+
+/* Hide the number input spinners */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Long history lists skip rendering off-screen day groups */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 320px;
+}
+
+/* Form fields: 12px radius everywhere */
+@layer components {
+  .field {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    border-radius: 12px;
+    border: 2px solid var(--color-soft);
+    background: #fff;
+    padding: 10px 14px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-ink);
+    transition: border-color 150ms ease;
+  }
+  .field:hover {
+    border-color: var(--color-mid);
+  }
+  .field:focus-visible {
+    outline: 3px solid var(--color-btn);
+    outline-offset: 1px;
+    border-color: var(--color-btn);
+  }
+  .field[aria-invalid="true"] {
+    border-color: var(--color-btn);
+  }
+  textarea.field {
+    resize: vertical;
+    min-height: 88px;
+  }
+}
+
+/* On/off switch built on a real checkbox */
+.switch {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  flex-shrink: 0;
+  width: 52px;
+  height: 32px;
+  border-radius: 9999px;
+  background: #b07a91;
+  cursor: pointer;
+}
+.switch::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(201 47 109 / 0.35);
+}
+.switch:checked {
+  background: var(--color-btn);
+}
+.switch:checked::before {
+  transform: translateX(20px);
+}
+
+@media (hover: hover) {
+  .band:has(.band-button:hover):not([data-current])::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: 14px;
+    box-shadow: inset 0 0 0 2px var(--color-soft);
+    pointer-events: none;
+    z-index: 12;
+  }
+}
