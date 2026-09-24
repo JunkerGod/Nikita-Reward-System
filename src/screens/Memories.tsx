@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ArrowSquareOutIcon, CaretLeftIcon, CaretRightIcon, ImagesIcon, PlayIcon } from "@phosphor-icons/react";
 import { useData } from "../lib/data";
-import { fetchAlbum, parseAlbumToken, type Album } from "../lib/album";
+import { fetchAlbum, parseAlbumLink, type Album } from "../lib/album";
 import { useHref, useRouter } from "../lib/router";
 import { BackLink, ButtonLink, EmptyState, ErrorState, IconButton, LoadingScreen, PageTitle, Skeleton, buttonClass } from "../components/ui";
 import { Sheet } from "../components/Sheet";
@@ -18,20 +18,34 @@ export function Memories() {
   const [state, setState] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [retry, setRetry] = useState(0);
 
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  // First page shows as soon as it arrives; the rest keep loading in the background.
   useEffect(() => {
-    if (!parseAlbumToken(link)) return;
+    if (!parseAlbumLink(link)) return;
     let cancelled = false;
     setState("loading");
-    fetchAlbum(link)
-      .then((a) => {
+    (async () => {
+      try {
+        let page = await fetchAlbum(link);
         if (cancelled) return;
-        setAlbum(a);
+        setAlbum(page);
         setState("ready");
-      })
-      .catch((e) => {
+        let all = page.photos;
+        for (let i = 0; page.next && i < 10; i++) {
+          setLoadingMore(true);
+          page = await fetchAlbum(link, page.next);
+          if (cancelled) return;
+          all = [...all, ...page.photos];
+          setAlbum({ ...page, photos: all });
+        }
+      } catch (e) {
         console.error(e);
-        if (!cancelled) setState("error");
-      });
+        if (!cancelled) setState((s) => (s === "ready" ? s : "error"));
+      } finally {
+        if (!cancelled) setLoadingMore(false);
+      }
+    })();
     return () => {
       cancelled = true;
     };
@@ -53,16 +67,16 @@ export function Memories() {
   return (
     <>
       <BackLink />
-      <PageTitle sub={album ? `${album.name}, ${photos.length} photos` : "Our shared album"}>Memories</PageTitle>
+      <PageTitle sub={album ? `${album.name}, ${photos.length}${loadingMore ? "+" : ""} photos` : "Our shared album"}>Memories</PageTitle>
 
       {status === "loading" ? (
         <LoadingScreen>
           <GridSkeleton />
         </LoadingScreen>
-      ) : !parseAlbumToken(link) ? (
+      ) : !parseAlbumLink(link) ? (
         <EmptyState icon={<ImagesIcon size={28} aria-hidden="true" />} message="No album linked yet">
           <p className="max-w-xs text-sm font-semibold text-muted">
-            In Photos, open ur shared album, tap the people icon, turn on Public Website, then paste the link in Settings
+            In Photos, open ur shared album, tap the people icon, tap Copy Album Link, then paste it in Settings
           </p>
           <ButtonLink href="/settings" size="sm">
             Link Album
@@ -76,7 +90,7 @@ export function Memories() {
         <div className="flex flex-col items-center gap-3">
           <ErrorState
             onRetry={() => setRetry((r) => r + 1)}
-            message="Cant load the album rn. Check Public Website is still on in Photos, then try again"
+            message="Cant load the album rn. Check anyone with the link can still see it in Photos, then try again"
           />
           {openInPhotos}
         </div>
@@ -121,21 +135,40 @@ export function Memories() {
         open={!!open}
         onClose={() => navigate(href({ photo: null }), { replace: true })}
         variant="center"
-        title={open?.caption ?? "Memory"}
+        title={open?.caption ?? (open?.video ? "Video" : "Memory")}
         description={
           open ? [open.date ? dateFmt.format(new Date(open.date)) : null, open.by ? `by ${open.by}` : null].filter(Boolean).join(", ") : undefined
         }
       >
         {open ? (
           <div className="flex flex-col items-center gap-3 pb-2">
-            <img
-              src={open.full.url}
-              alt={open.caption ?? "Photo from our album"}
-              width={open.full.width}
-              height={open.full.height}
-              className="max-h-[60dvh] w-auto max-w-full rounded-xl object-contain"
-            />
-            {open.video ? <p className="text-sm font-bold text-muted">Its a video, open it in Photos to play</p> : null}
+            {open.video && open.videoUrl ? (
+              <video
+                key={open.id}
+                src={open.videoUrl}
+                poster={open.full.url}
+                controls
+                playsInline
+                preload="metadata"
+                width={open.full.width || undefined}
+                height={open.full.height || undefined}
+                className="max-h-[60dvh] w-auto max-w-full rounded-xl bg-ink"
+              />
+            ) : (
+              <img
+                key={open.id}
+                src={open.full.url}
+                alt={open.caption ?? "Photo from our album"}
+                width={open.full.width || open.thumb.width}
+                height={open.full.height || open.thumb.height}
+                // Browsers that can't show HEIC fall back to the smaller JPEG.
+                onError={(e) => {
+                  if (e.currentTarget.src !== open.thumb.url) e.currentTarget.src = open.thumb.url;
+                }}
+                className="max-h-[60dvh] w-auto max-w-full rounded-xl object-contain"
+              />
+            )}
+            {open.video && !open.videoUrl ? <p className="text-sm font-bold text-muted">Its a video, open it in Photos to play</p> : null}
             <div className="flex items-center gap-2">
               <IconButton label="Previous photo" onClick={() => go(openIdx - 1)}>
                 <CaretLeftIcon size={22} aria-hidden="true" />

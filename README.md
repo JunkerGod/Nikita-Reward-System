@@ -99,7 +99,8 @@ fixes the balance by itself. See `supabase/migrations/20260924000001_schema.sql`
 
 ## Photo memories
 
-The Memories page reads an iCloud shared album with "Public Website" turned on. The link is
-saved in Settings (`app_settings.icloud_album`), and `netlify/functions/album.mts` fetches the
-album's public web feed. Apple can change that feed without notice; if it stops working the page
+The Memories page reads an iCloud shared album that anyone with the link can view. The link is
+saved in Settings (`app_settings.icloud_album`), and `netlify/functions/album.mts` fetches it:
+new-style links (`photos.icloud.com/shared/album/...`) through CloudKit's anonymous public
+access, old-style links (`icloud.com/sharedalbum/#...`) through the sharedstreams web feed. Apple can change that feed without notice; if it stops working the page
 falls back to an "Open in Photos" button.

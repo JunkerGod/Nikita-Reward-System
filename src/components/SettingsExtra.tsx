@@ -7,7 +7,7 @@ import { useToast } from "./Toasts";
 import { Button, Counter, IconButton } from "./ui";
 import { ConfirmDialog, Sheet } from "./Sheet";
 import { daysUntil, prettyName, upcoming } from "../lib/specialDays";
-import { parseAlbumToken } from "../lib/album";
+import { parseAlbumLink } from "../lib/album";
 import type { SpecialDay } from "../lib/types";
 
 const dateFmt = new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "long", year: "numeric" });
@@ -187,7 +187,7 @@ export function AlbumSettings() {
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     const link = value.trim();
-    if (link && !parseAlbumToken(link)) {
+    if (link && !parseAlbumLink(link)) {
       setError("That doesnt look like an iCloud shared album link");
       return;
     }
@@ -210,7 +210,7 @@ export function AlbumSettings() {
         Photo memories
       </h2>
       <p className="mb-3 text-sm font-semibold text-muted">
-        In Photos, open ur shared album, tap the people icon, turn on Public Website and copy the link
+        In Photos, open ur shared album, tap the people icon, then Copy Album Link
       </p>
       <form onSubmit={submit} noValidate className="flex flex-col gap-2">
         <label htmlFor="album-link" className="text-sm font-extrabold text-ink">
@@ -225,7 +225,7 @@ export function AlbumSettings() {
           spellCheck={false}
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          placeholder="https://www.icloud.com/sharedalbum/#B0a…"
+          placeholder="https://photos.icloud.com/shared/album/…"
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? "album-error" : undefined}
           className="field"

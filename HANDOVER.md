@@ -21,8 +21,9 @@ the tab bar. Open it and tap "Hide this badge" once on each phone; the phone rem
 
 ## Linking the shared album (once)
 
-In Photos, open ur shared album, tap the people icon, turn on Public Website, copy the link.
-Then More, Settings, Photo memories, paste it and tap Save Link. Photos added to the album
+In Photos, open the shared album, tap the people icon, then Copy Album Link (Sharing Options
+must let anyone with the link see it). Then More, Settings, Photo memories, paste it and tap
+Save Link. Photos added to the album
 show up in More, Memories.
 
 ## Changing things without code
@@ -53,7 +54,7 @@ show up in More, Memories.
 
 5. **Notifications stopped.** On that phone: Settings, Notifications, Turn Off, then Turn On
    again. If the phone was reset or the app removed from the Home Screen, just turn them on again.
-6. **Memories page says it cant load.** Check Public Website is still on for the album in Photos.
+6. **Memories page says it cant load.** In Photos, check the album is still shared by link.
 7. **Balance looks wrong.** More, History shows every entry. Delete the wrong one (it asks
    first) and the balance fixes itself.
 
