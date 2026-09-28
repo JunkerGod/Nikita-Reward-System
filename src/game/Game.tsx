@@ -141,6 +141,28 @@ export default function Game() {
 
   const showToast = useCallback((text: string) => setToast({ text, id: Date.now() }), []);
 
+  // ---- no zooming while the game is open (iPhone double tap and pinch)
+  useEffect(() => {
+    const meta = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
+    const before = meta?.content;
+    // Setting maximum-scale also snaps the page back if it did get zoomed.
+    if (meta) meta.content = "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover";
+    const stop = (e: Event) => e.preventDefault();
+    const pinch = (e: TouchEvent) => {
+      if (e.touches.length > 1 && e.cancelable) e.preventDefault();
+    };
+    const opts = { passive: false } as const;
+    document.addEventListener("gesturestart", stop, opts);
+    document.addEventListener("gesturechange", stop, opts);
+    document.addEventListener("touchmove", pinch, opts);
+    return () => {
+      if (meta && before) meta.content = before;
+      document.removeEventListener("gesturestart", stop);
+      document.removeEventListener("gesturechange", stop);
+      document.removeEventListener("touchmove", pinch);
+    };
+  }, []);
+
   // ---- music for menus
   useEffect(() => {
     if (screen !== "play") engine.audio.playMusic("title");

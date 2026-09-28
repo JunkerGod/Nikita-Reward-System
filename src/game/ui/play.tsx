@@ -340,9 +340,37 @@ export function GameToast({ text, id }: { text: string; id: number }) {
 
 const SIZES = { s: 60, m: 72, l: 86 };
 
+/**
+ * iPhone Safari treats a quick double tap as "zoom in", and one finger holding an arrow while
+ * another taps jump as a pinch. Cancelling the touch events on the controls stops both; the
+ * pointer events the buttons use still arrive.
+ */
+function useNoZoom() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const stop = (e: TouchEvent) => {
+      if (e.cancelable) e.preventDefault();
+    };
+    const opts = { passive: false } as const;
+    el.addEventListener("touchstart", stop, opts);
+    el.addEventListener("touchmove", stop, opts);
+    el.addEventListener("touchend", stop, opts);
+    return () => {
+      el.removeEventListener("touchstart", stop);
+      el.removeEventListener("touchmove", stop);
+      el.removeEventListener("touchend", stop);
+    };
+  }, []);
+  return ref;
+}
+
 export function TouchControls({ input, size, lefty, calls, layout, onPause }: { input: Input; size: "s" | "m" | "l"; lefty: boolean; calls: number; layout: "overlay" | "deck"; onPause: () => void }) {
   const px = SIZES[size];
   const pad = useRef<HTMLDivElement>(null);
+  const leftZone = useNoZoom();
+  const rightZone = useNoZoom();
   const padPointer = useRef<number | null>(null);
 
   const setDir = (dir: "left" | "right" | null) => {
@@ -420,7 +448,7 @@ export function TouchControls({ input, size, lefty, calls, layout, onPause }: { 
 
   if (layout === "deck")
     return (
-      <div className={cx("flex h-full items-center justify-between px-5", lefty && "flex-row-reverse")} style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+      <div ref={leftZone} className={cx("flex h-full items-center justify-between px-5", lefty && "flex-row-reverse")} style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
         {dpad}
         {actions}
       </div>
@@ -431,8 +459,12 @@ export function TouchControls({ input, size, lefty, calls, layout, onPause }: { 
         {pause}
       </div>
       <div className={cx("pointer-events-none absolute inset-x-0 bottom-0 z-10 flex items-end justify-between", lefty && "flex-row-reverse")} style={{ padding: "0 max(18px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left))" }}>
-        <div className="pointer-events-auto">{dpad}</div>
-        <div className="pointer-events-auto">{actions}</div>
+        <div ref={leftZone} className="pointer-events-auto">
+          {dpad}
+        </div>
+        <div ref={rightZone} className="pointer-events-auto">
+          {actions}
+        </div>
       </div>
     </>
   );
