@@ -14,6 +14,20 @@ coupons, milestone badges, special days (with a countdown and themed confetti), 
 "Us, in Numbers" stats page, a monthly recap, phone notifications and photo memories from an
 iCloud shared album.
 
+## Nikita's Adventure (the game)
+
+More, then Nikita's Adventure. A 2D platformer with 7 levels, one per date, played newest
+first (Penrith on 13 Sep back to Timezone on 9 July). It lives in `src/game/` and is its own
+lazy-loaded chunk, so it only downloads when opened.
+
+- `art/`: every character, item and place is drawn in code (Canvas 2D), no image files
+- `engine/`: the world (physics, enemies, camera), input, synthesised sound, sprite cache, HUD
+- `levels/`: the 7 levels, built with a small builder, plus all the chat lines
+- `ui/`: menus, chat bubbles, pop-ups, touch controls
+- Progress is saved on the phone and in `game_saves`. Nikita earns small app points through
+  `game_reward()` (5 per first clear, 2 per new star, 25 for finishing, max 30 a day).
+- The real Hamafilm strip is in the private `faces` bucket at `game/hamafilm-strip.jpg`.
+
 ## Stack
 
 - Vite + React + TypeScript, built as a static site

@@ -26,6 +26,12 @@ must let anyone with the link see it). Then More, Settings, Photo memories, past
 Save Link. Photos added to the album
 show up in More, Memories.
 
+## Nikita's Adventure
+
+More, then Nikita's Adventure. Works sideways or upright on a phone, and with the keyboard on
+a laptop. Progress follows her between devices. Game points show up in History as
+"Nikita's Adventure".
+
 ## Changing things without code
 
 - Rewards and prices: Shop tab, Add Reward (Jagath only). Edit, Hide or Delete on each card.

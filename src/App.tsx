@@ -25,6 +25,8 @@ import { NotFound } from "./screens/NotFound";
 const Stats = lazy(() => import("./screens/Stats").then((m) => ({ default: m.Stats })));
 const Recap = lazy(() => import("./screens/Recap").then((m) => ({ default: m.Recap })));
 const Memories = lazy(() => import("./screens/Memories").then((m) => ({ default: m.Memories })));
+// The game is its own chunk: it only downloads when someone opens it.
+const Game = lazy(() => import("./game/Game"));
 
 export function App() {
   return (
@@ -80,6 +82,7 @@ function Shell() {
   // Screen change: a quick fade and slide, then focus the new page title.
   useGSAP(
     () => {
+      if (!main.current) return;
       const mm = gsap.matchMedia();
       mm.add(FULL, () => {
         gsap.fromTo(main.current, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.2, ease: "power2.out", clearProps: "transform" });
@@ -94,6 +97,31 @@ function Shell() {
     },
     { dependencies: [path], revertOnUpdate: true },
   );
+
+  if (path === "/game") {
+    if (status !== "ready")
+      return (
+        <LoadingScreen>
+          <div className="mx-auto max-w-md p-6">
+            <Skeleton className="h-14 w-72" />
+          </div>
+        </LoadingScreen>
+      );
+    return (
+      <Suspense
+        fallback={
+          <LoadingScreen>
+            <div className="mx-auto max-w-md p-6">
+              <Skeleton className="h-14 w-72" />
+              <Skeleton className="mt-6 h-48" />
+            </div>
+          </LoadingScreen>
+        }
+      >
+        <Game />
+      </Suspense>
+    );
+  }
 
   return (
     <>

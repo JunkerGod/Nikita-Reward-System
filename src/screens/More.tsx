@@ -1,4 +1,4 @@
-import { CaretRightIcon, ChartLineUpIcon, ClockCounterClockwiseIcon, GearIcon, ImagesIcon, SparkleIcon, TicketIcon, type Icon } from "@phosphor-icons/react";
+import { CaretRightIcon, ChartLineUpIcon, ClockCounterClockwiseIcon, GameControllerIcon, GearIcon, ImagesIcon, SparkleIcon, TicketIcon, type Icon } from "@phosphor-icons/react";
 import { Link } from "../lib/router";
 import { PageTitle } from "../components/ui";
 import { useData } from "../lib/data";
@@ -7,6 +7,7 @@ export function More() {
   const { redemptions } = useData();
   const waiting = redemptions.filter((r) => r.status === "claimed").length;
   const items: { href: string; label: string; hint: string; icon: Icon }[] = [
+    { href: "/game", label: "Nikita\u2019s Adventure", hint: "Our dates, as a game", icon: GameControllerIcon },
     { href: "/my-rewards", label: "My Rewards", hint: waiting ? `${waiting} coupon${waiting === 1 ? "" : "s"} ready` : "Ur coupons", icon: TicketIcon },
     { href: "/stats", label: "Us, in Numbers", hint: "Stats, special days and badges", icon: ChartLineUpIcon },
     { href: "/recap", label: "Monthly Recap", hint: "How this month is going", icon: SparkleIcon },
